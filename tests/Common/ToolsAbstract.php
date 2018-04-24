@@ -18,7 +18,7 @@ abstract class ToolsAbstract extends WebTestCase
     protected $router;
 
     /**
-     * @var Client
+     * @var
      */
     protected $client;
 
@@ -108,7 +108,7 @@ abstract class ToolsAbstract extends WebTestCase
     /**
      * @param array $options
      * @param array $server
-     * @return Client
+     * @return mixed|Client
      */
     protected static function createClient(array $options = array(), array $server = array())
     {

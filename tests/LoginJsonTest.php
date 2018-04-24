@@ -27,27 +27,28 @@ class LoginJsonTest extends ToolsAbstract
             'CONTENT_TYPE' => 'application/json',
             ];
 
-        $crawler = $client->request('GET', $uriSecured);
+        $client->request('GET', $uriSecured);
         $this->assertEquals(401, $client->getResponse()->getStatusCode(), $errMsg);
         $this->assertEquals(["message" => "Authentication Required", ], json_decode($client->getResponse()->getContent(), true), $errMsg);
 
-        $crawler = $client->request('POST', $uriLogin, [], [], $headers, json_encode(['login_username' => 15, 'login_password' => $this->testPwd,]));
+        $client->request('POST', $uriLogin, [], [], $headers, json_encode(['login_username' => 15, 'login_password' => $this->testPwd,]));
         $this->assertEquals(403, $client->getResponse()->getStatusCode(), $errMsg);
         $this->assertEquals(["message" => "_csrf_token mandatory", "code" => 420, ], json_decode($client->getResponse()->getContent(), true), $errMsg);
 
         $client->request('GET', $uriToken);
-        $token = $client->getResponse()->getContent();
+        $tokenRaw = $client->getResponse()->getContent();
+        $token = json_decode($tokenRaw);
 
-        $crawler = $client->request('POST', $uriLogin, [], [], $headers, json_encode(['login_username' => 15, 'login_password' => $this->testPwd, '_csrf_token' => 'toto',]));
+        $client->request('POST', $uriLogin, [], [], $headers, json_encode(['login_username' => 15, 'login_password' => $this->testPwd, '_csrf_token' => 'toto',]));
         $this->assertEquals(403, $client->getResponse()->getStatusCode(), $errMsg);
-        $this->assertEquals(["message" => "Invalid CSRF token", "code" => 403, ], json_decode($client->getResponse()->getContent(), true), $errMsg);
+        $this->assertEquals(["message" => "Invalid CSRF token.", "code" => 423, ], json_decode($client->getResponse()->getContent(), true), $errMsg);
 
-        $crawler = $client->request('POST', $uriLogin, [], [], $headers, json_encode(['login_username' => 15, 'login_password' => $this->testPwd, '_csrf_token' => $token,]));
+        $client->request('POST', $uriLogin, [], [], $headers, json_encode(['login_username' => 15, 'login_password' => $this->testPwd, '_csrf_token' => $token,]));
         $this->assertEquals(403, $client->getResponse()->getStatusCode(), $errMsg);
-        $this->assertEquals(["message" => "Invalid CSRF token", "code" => 403, ], json_decode($client->getResponse()->getContent(), true), $errMsg);
+        $this->assertEquals(["message" => "Forbidden", "code" => 403, ], json_decode($client->getResponse()->getContent(), true), $errMsg);
 
-        $crawler = $client->request('POST', $uriLogin, [], [], $headers, json_encode(['login_username' => 15, 'login_password' => $this->testPwd, '_csrf_token' => $token,]));
-        $this->assertEquals(403, $client->getResponse()->getStatusCode(), $errMsg);
-        $this->assertEquals(["message" => "Forbidden.", "code" => 403, ], json_decode($client->getResponse()->getContent(), true), $errMsg);
+        $client->request('POST', $uriLogin, [], [], $headers, json_encode(['login_username' => $this->testLogin, 'login_password' => $this->testPwd, '_csrf_token' => $token,]));
+        $this->assertEquals(200, $client->getResponse()->getStatusCode(), $errMsg);
+        $this->assertEquals([], json_decode($client->getResponse()->getContent(), true), $errMsg);
     }
 }
