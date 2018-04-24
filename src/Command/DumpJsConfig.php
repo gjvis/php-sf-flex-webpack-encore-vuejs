@@ -6,6 +6,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\Yaml\Yaml;
@@ -32,13 +33,22 @@ class DumpJsConfig extends ContainerAwareCommand
      */
     protected $rootDir;
 
-    public function __construct(string $csrfTokenParameter, string $apiPlatformPrefix, \Twig_Environment $twig)
+    public function __construct(
+        string $csrfTokenParameter,
+        string $apiPlatformPrefix,
+        string $loginUsernamePath,
+        string $loginPasswordPath,
+        \Twig_Environment $twig,
+        RouterInterface $router)
     {
         parent::__construct();
 
         $this->twig = $twig;
+        $this->router = $router;
         $this->csrfTokenParameter = $csrfTokenParameter;
         $this->apiPlatformPrefix = $apiPlatformPrefix;
+        $this->loginUsernamePath = $loginUsernamePath;
+        $this->loginPasswordPath = $loginPasswordPath;
     }
 
     protected function configure()
@@ -105,6 +115,11 @@ class DumpJsConfig extends ContainerAwareCommand
             'port' => trim($port),
             'csrfTokenParameter' => $this->csrfTokenParameter,
             'apiPlatformPrefix' => $this->apiPlatformPrefix,
+            'loginUsernamePath' => $this->loginUsernamePath,
+            'loginPasswordPath' => $this->loginPasswordPath,
+            'uriLoginJson' => $this->router->generate('demo_login_json'),
+            'uriLoginJwt' => $this->router->generate('app_loginjwt_newtoken'),
+            'uriIsLoggedIn' => $this->router->generate('demo_secured_page_is_logged_in'),
             'quasarStyle' => $quasarStyle,
             'apiPlatform' => $apiPlatform,
         ]);

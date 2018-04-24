@@ -6,18 +6,53 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\User\InMemoryUserProvider;
+use Symfony\Component\Security\Core\Exception\BadCredentialsException;
+use Lexik\Bundle\JWTAuthenticationBundle\Encoder\JWTEncoderInterface;
 
-class LoginJsonController extends Controller
+class LoginJwtController extends Controller
 {
     /**
-     * The route that displays the JS form
-     * @Route("/demo/security/login/json/frontend")
-     * @Method({"GET"})
+     * The route that generate token for a couple login/password
+     * It works with Basi HTTP auth or with formData using login/password where path are store in parameters: login_username_path/login_password_path
+     *
+     * @Route("/demo/security/login/jwt/tokens")
+     * @Method({"POST"})
      */
-    public function index()
+    public function newTokenAction(Request $request, InMemoryUserProvider $provider, JWTEncoderInterface $encoder)
     {
-        return $this->render('spa-quasar.html.twig', ['appName' => 'login', 'useParent' => true, ]);
+        $username = $request->getUser() ? : $request->request->get($this->getParameter('login_username_path'));
+        $password = $request->getPassword() ? : $request->request->get($this->getParameter('login_password_path'));
+
+        if (!$username) {
+            $json = json_decode($request->getContent(), true);
+            if (!json_last_error()) {
+                $username = $json[$this->getParameter('login_username_path')];
+                $password = $json[$this->getParameter('login_password_path')];
+            }
+        }
+
+        $user = $provider->loadUserByUsername($username);
+
+        if (!$user) {
+            throw $this->createNotFoundException();
+        }
+
+        $isValid = $this->get('security.password_encoder')
+            ->isPasswordValid($user, $password);
+
+        if (!$isValid) {
+            throw new BadCredentialsException();
+        }
+
+        $token = $encoder->encode([
+            'username' => $username,
+            'exp' => time() * $this->getParameter('token_jwt_ttl')
+        ]);
+
+        return new JsonResponse(['token' => $token]);
     }
 
     /**

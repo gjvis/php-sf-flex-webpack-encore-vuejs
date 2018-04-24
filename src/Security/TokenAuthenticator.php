@@ -86,11 +86,6 @@ class TokenAuthenticator extends AbstractGuardAuthenticator
      */
     public function supports(Request $request)
     {
-        // do not force this Authenticator for Csrf, for instance (need more work on api-platforms events)
-        if (false !== strpos($request->getPathInfo(), $this->apiPlatformPrefix)) {
-            return false;
-        }
-
         return $this->csrfTokenParameter &&
             !(false === strpos($request->getRequestFormat(), 'json')
             && false === strpos($request->getContentType(), 'json'));

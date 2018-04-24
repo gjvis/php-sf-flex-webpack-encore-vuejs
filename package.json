@@ -17,6 +17,8 @@
         "init-project:windows": "cp .env.dist .env && composer install && npm install && npm run db-init:windows && npm run dump-js-config:windows && cd assets/js/devxpress-angular/ && npm install && cd ../../../ && npm run dev:windows",
         "db-init": "$npm_package_config_php bin/console doctrine:database:create && $npm_package_config_php bin/console doctrine:schema:create && $npm_package_config_php bin/console doctrine:fixtures:load -n",
         "db-init:windows": "%npm_package_config_php% bin/console doctrine:database:create && %npm_package_config_php% bin/console doctrine:schema:create && %npm_package_config_php% bin/console doctrine:fixtures:load -n",
+        "jwt-init": "echo 'Use the same passphrase that is your .env file' && mkdir config/jwt && cd $_ && openssl genrsa -out private.pem -aes256 4096 && openssl rsa -pubout -in private.pem -out public.pem",
+        "jwt-init:windows": "echo 'Use the same passphrase that is your .env file' && mkdir config\\jwt && cd config\\jwt && openssl genrsa -out private.pem -aes256 4096 && openssl rsa -pubout -in private.pem -out public.pem",
         "dump-js-config": "rm assets/js/config.js -f && $npm_package_config_php bin/console app:dump-js-config $npm_package_config_server_host_web $npm_package_config_server_port_web $npm_package_config_quasar_style",
         "dump-js-config:windows": "rm assets/js/config.js -f && %npm_package_config_php% bin/console app:dump-js-config %npm_package_config_server_host_web% %npm_package_config_server_port_web% %npm_package_config_quasar_style%",
         "sf-dev": "echo 'you should use nginx/apache server, read the README' && $npm_package_config_php -S $npm_package_config_server_host_web:$npm_package_config_server_port_web -t public",
