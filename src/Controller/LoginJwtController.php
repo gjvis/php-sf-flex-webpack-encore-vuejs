@@ -15,13 +15,27 @@ use Lexik\Bundle\JWTAuthenticationBundle\Encoder\JWTEncoderInterface;
 class LoginJwtController extends Controller
 {
     /**
+     * Try to test this security when the one on the bottom works Security("is_granted('IS_AUTHENTICATED_FULLY')")
+     *
+     * @Security("is_granted('IS_AUTHENTICATED_FULLY')")
+     * @Route("/demo/security/login/jwt/secured", name="demo_secured_page_jwt")
+     * @Method({"GET"})
+     */
+    public function index()
+    {
+        $user = $this->getUser();
+
+        return $this->render('login/index.html.twig', ['user' => $user, ]);
+    }
+
+    /**
      * The route that generate token for a couple login/password
      * It works with Basi HTTP auth or with formData using login/password where path are store in parameters: login_username_path/login_password_path
      *
      * @Route("/demo/security/login/jwt/tokens")
      * @Method({"POST"})
      */
-    public function newTokenAction(Request $request, InMemoryUserProvider $provider, JWTEncoderInterface $encoder)
+    public function newToken(Request $request, InMemoryUserProvider $provider, JWTEncoderInterface $encoder)
     {
         $username = $request->getUser() ? : $request->request->get($this->getParameter('login_username_path'));
         $password = $request->getPassword() ? : $request->request->get($this->getParameter('login_password_path'));
@@ -56,19 +70,6 @@ class LoginJwtController extends Controller
     }
 
     /**
-     * New Json authentification system from Symfony 3.3
-     * It relies on App\Security\ApiKeyAuthenticator for CSRF checks
-     *
-     * @Route("/demo/security/login/json", name="demo_login_json")
-     *
-     * @return JsonResponse
-     */
-    public function loginJson()
-    {
-        return new JsonResponse();
-    }
-
-    /**
      * Try to test this security when the one on the bottom works Security("is_granted('IS_AUTHENTICATED_FULLY')")
      *
      * call it with .json extension and check if you have a 200
@@ -78,8 +79,8 @@ class LoginJwtController extends Controller
      *
      * @Security("is_granted('IS_AUTHENTICATED_FULLY')")
      * @Route(
-     *     "/demo/security/login/json/isloggedin",
-     *     name="demo_secured_page_is_logged_in",
+     *     "/demo/security/login/jwt/isloggedin",
+     *     name="demo_secured_page_jwt_is_logged_in",
      *     )
      * @Method({"GET"})
      */

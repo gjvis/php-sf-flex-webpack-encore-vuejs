@@ -227,16 +227,28 @@ On PHP i use those 2 packages to prevent the use of deprecated packages or with 
 On JS i use snyk services.
 
 @TODO finish on PHP and JS checks + tools to audit the code + software that analyse sql/xss/file injection, csrf, ...
-
+@TODO explain the usage of tools like OWASP ZED, sqlmap, php avenger...
 @TODO help to setup security system: stateful app = take care at csrf ; stateless app = should i use jwt, api key, OAuth, anything else ?
 
+### Symfony security
 In Symfony i configured different firewalls:
  * *security_js* and *security_php* share the same context so when you are logged on one, you are also logged on the other. I did this because a firewall cannot use both form_login and json_login (or i didn't found the way), and i wnated you to understand the concept of context.
  * *security_jwt* is for stateless app. You can read the following tutorial to understand [https://knpuniversity.com/screencast/symfony-rest4](https://knpuniversity.com/screencast/symfony-rest4)
 
 If you doesn't need JWT, you can use ApiKey pattern. For this you have to implement the required Authenticator: https://symfony.com/doc/current/security/api_key_authentication.html
+If you need more tuning with huge APIs, you may require OAuth with JWT. OAuth will help you so have a look at this website: https://oauth.net/
 
-@TODO explain the usage of tools like OWASP ZED, sqlmap, php avenger...
+### Cookies
+In statefull app you will have HTTP Cookies. Even if you don't really manipulate them, and that they are used only to transport the sessionId between the server and the client.
+But if you use them to store other informations, you should be aware that they can be misused and that they can open XSS or CSRF web fail.
+Your cookies must have some specific attributes:
+ * secure
+ * httponly
+ * date (to prevent them to be infinite)
+ * samesite (strict or lax...)
+ 
+You have to pay attention at them. And you can play with them on those sites: http://cookies.rocks and http://example-bar.com (source here: https://github.com/hsablonniere/cookies.rocks and related talk here: https://github.com/hsablonniere/talk-back-to-basics-cookies)
+
 
 ## API
 
@@ -481,6 +493,7 @@ It takes the following JSON string as Body:
 - [ ] back: customize React Admin to display more information on datagrid, and customize form in book edition per example
 - [ ] back: keep EasyAdminBundle or React Admin: make a choice coz both are doing the same, i need to measure differences, and also the ease to do custom screen (change forms, manage rights...)
 - [ ] front: create another route with VueJS that use GQL instead of REST
+- [ ] front: add storyBook package for VueJS and Angular and use it to manage and test our components
 - [x] quality: code style: use phpcscbf instead of php_cs_fixer coz it's embeded with phpcs and it uses the phpcs config file: **I decided to keep php_cs_fixer because it's more complete!**
 - [ ] quality: transform this project into a meta package that will install all requirements for JS app within Symfony (like does laravel)
 - [x] security: check if i need the JMSSerializerBundle or if the serializer component is enough (if autowiring runs well, why not): **I prefer to use Symfony serializer, it's enough**

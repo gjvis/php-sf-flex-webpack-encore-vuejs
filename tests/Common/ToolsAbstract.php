@@ -18,7 +18,7 @@ abstract class ToolsAbstract extends WebTestCase
     protected $router;
 
     /**
-     * @var
+     * @var Client
      */
     protected $client;
 
@@ -68,7 +68,7 @@ abstract class ToolsAbstract extends WebTestCase
     {
         parent::setUp();
 
-        $this->testLogin = 'test';
+        $this->testLogin = 'test_js';
         $this->testPwd = 'test';
 
         $kernel = static::bootKernel();
@@ -108,7 +108,7 @@ abstract class ToolsAbstract extends WebTestCase
     /**
      * @param array $options
      * @param array $server
-     * @return mixed|Client
+     * @return Client
      */
     protected static function createClient(array $options = array(), array $server = array())
     {
