@@ -56,7 +56,7 @@
         "karma-jasmine-html-reporter": "^1.0.0",
         "offline-plugin": "^4.9.0",
         "prop-types": "^15.6.1",
-        "quasar-cli": "^0.15.14",
+        "quasar-cli": "^0.17.19",
         "quasar-extras": "^1.0.2",
         "quasar-framework": "^0.15.10",
         "react": "^16.3.1",
